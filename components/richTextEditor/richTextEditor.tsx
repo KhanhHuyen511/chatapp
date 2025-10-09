@@ -281,6 +281,30 @@ const RichTextEditor: FC<Props> = ({ className }) => {
     }
   };
 
+  const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    if (e.clipboardData.types.includes('text/plain')) {
+      const pastedText = e.clipboardData.getData('text/plain');
+      const urlRegex = /^https?:\/\/[^\s]+$/i;
+      const isUrl = urlRegex.test(pastedText);
+      if (isUrl) {
+        e.preventDefault();
+        insertFormatting('[', `](${pastedText})`);
+        return;
+      }
+    }
+
+    const items = Array.from(e.clipboardData.items);
+    const images = items.filter((item) => item.type.startsWith('image'));
+
+    if (images.length > 0) {
+      e.preventDefault();
+      const file = images[0].getAsFile();
+      if (file) {
+        setAttachedFiles((prev) => [...prev, file]);
+      }
+    }
+  };
+
   return (
     <div className={className}>
       <div className="border px-4 pb-4 pt-2 rounded-xl space-y-2">
@@ -301,6 +325,7 @@ const RichTextEditor: FC<Props> = ({ className }) => {
             style={{ whiteSpace: 'pre-wrap' }}
             value={input}
             onChange={handleInput}
+            onPaste={handlePaste}
             onKeyDown={handleKeyDown}
             disabled={isPreview}
             data-placeholder="Type your message here"
