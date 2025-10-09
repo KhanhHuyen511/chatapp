@@ -1,7 +1,7 @@
 'use client';
 
 import Bubble from '@/components/bubble';
-import RichTextEditor from '@/components/richTextEditor';
+import RichTextEditor from '@/components/richTextEditor/richTextEditor';
 import { ChatProvider, useChat } from '@/contexts/chatContext';
 
 export default function Home() {
@@ -23,6 +23,7 @@ export default function Home() {
           <Bubble
             key={message.id}
             content={message.content}
+            attachments={message.attachments}
             createdAt={message.createdAt}
             createdBy={message.createdBy}
           />
