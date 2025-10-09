@@ -135,3 +135,11 @@ ul {
 ol {
   @apply list-decimal list-inside;
 }
+
+a {
+  @apply text-blue-500 hover:underline;
+}
+
+code {
+  @apply bg-gray-100 px-1 py-0.5 rounded-md;
+}

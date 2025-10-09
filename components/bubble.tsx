@@ -5,6 +5,7 @@ import { User } from '@/lib/types/user';
 import { cn } from '@/lib/utils';
 import React, { FC } from 'react';
 import Attachment from './richTextEditor/attachment';
+import { markdownToHtml } from '@/lib/utils/markdown';
 
 type Props = {
   content: string;
@@ -25,7 +26,7 @@ const Bubble: FC<Props> = ({ content, attachments, createdAt, createdBy }) => {
           : 'bg-gray-100 mr-auto'
       )}
     >
-      <p dangerouslySetInnerHTML={{ __html: content }} />
+      <div dangerouslySetInnerHTML={{ __html: markdownToHtml(content) }} />
       {attachments && attachments.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {attachments.map((file, index) => (

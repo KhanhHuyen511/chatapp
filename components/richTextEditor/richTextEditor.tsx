@@ -4,8 +4,8 @@ import React, { FC, useRef, useState } from 'react';
 import { Button } from '../ui/button';
 import { useChat } from '@/contexts/chatContext';
 import Toolbar from './toolbar';
-import { XIcon } from 'lucide-react';
 import Attachment from './attachment';
+import { markdownToHtml } from '@/lib/utils/markdown';
 
 type Props = {
   className?: string;
@@ -15,10 +15,11 @@ const RichTextEditor: FC<Props> = ({ className }) => {
   const { addMessage } = useChat();
 
   const [input, setInput] = useState('');
-  const editorRef = useRef<HTMLDivElement>(null);
+  const editorRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
+  const [isPreview, setIsPreview] = useState(false);
 
   const handleSend = (message: string) => {
     addMessage({
@@ -43,9 +44,76 @@ const RichTextEditor: FC<Props> = ({ className }) => {
     }
   };
 
-  const execCommand = (command: string, value?: string) => {
-    document.execCommand(command, false, value);
-    editorRef.current?.focus();
+  const insertFormatting = (before: string, after: string) => {
+    const textarea = editorRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = input.substring(start, end);
+    const newText =
+      input.substring(0, start) +
+      before +
+      selectedText +
+      after +
+      input.substring(end);
+
+    setInput(newText);
+
+    // Reset cursor position
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + before.length, end + before.length);
+    }, 0);
+  };
+
+  const insertList = (type: 'ordered' | 'unordered') => {
+    const textarea = editorRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = input.substring(start, end);
+
+    if (start === end || selectedText.trim() === '') {
+      const marker = type === 'ordered' ? '1. ' : '- ';
+      const newText = input.substring(0, start) + marker + input.substring(end);
+      setInput(newText);
+
+      // Set cursor position
+      setTimeout(() => {
+        textarea.focus();
+        textarea.setSelectionRange(
+          start + marker.length,
+          start + marker.length
+        );
+      }, 0);
+      return;
+    }
+
+    // Split selected text into lines
+    const lines = selectedText.split('\n');
+    console.log(lines);
+    const formattedLines = lines.map((line, index) => {
+      if (line.trim() === '') return line;
+      if (type === 'ordered') {
+        return `${index + 1}. ${line}`;
+      } else {
+        return `- ${line}`;
+      }
+    });
+
+    const formattedText = formattedLines.join('\n');
+    const newText =
+      input.substring(0, start) + formattedText + input.substring(end);
+
+    setInput(newText);
+
+    // Set cursor position after formatting
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start, start + formattedText.length);
+    }, 0);
   };
 
   const handleFileAttach = (attachedFiles: FileList) => {
@@ -60,25 +128,164 @@ const RichTextEditor: FC<Props> = ({ className }) => {
     }
   };
 
+  const handleTurnOnPreview = () => {
+    setIsPreview(true);
+  };
+
+  const handleTurnOffPreview = () => {
+    setIsPreview(false);
+  };
+
+  const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.currentTarget.value || '');
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
+      const textarea = editorRef.current;
+      if (!textarea) return;
+
+      const cursorPos = textarea.selectionStart;
+      const textBeforeCursor = input.substring(0, cursorPos);
+      const textAfterCursor = input.substring(cursorPos);
+
+      // Find the current line
+      const lines = textBeforeCursor.split('\n');
+      const currentLine = lines[lines.length - 1];
+
+      // Check for unordered list (- )
+      const unorderedMatch = currentLine.match(/^(\s*)- (.*)$/);
+      if (unorderedMatch) {
+        e.preventDefault();
+        const indent = unorderedMatch[1];
+        const content = unorderedMatch[2];
+
+        // If the list item is empty (only has the marker), exit the list
+        if (content.trim() === '') {
+          const newText =
+            textBeforeCursor.slice(0, -2) + '\n' + textAfterCursor;
+          setInput(newText);
+          setTimeout(() => {
+            textarea.focus();
+            textarea.setSelectionRange(cursorPos - 1, cursorPos - 1);
+          }, 0);
+          return;
+        }
+
+        // Continue the list with a new marker
+        const newText =
+          textBeforeCursor + '\n' + indent + '- ' + textAfterCursor;
+        setInput(newText);
+        setTimeout(() => {
+          textarea.focus();
+          const newPos = cursorPos + indent.length + 3;
+          textarea.setSelectionRange(newPos, newPos);
+        }, 0);
+        return;
+      }
+
+      // Check for ordered list (1. , 2. , etc.)
+      const orderedMatch = currentLine.match(/^(\s*)(\d+)\. (.*)$/);
+      if (orderedMatch) {
+        e.preventDefault();
+        const indent = orderedMatch[1];
+        const number = Number.parseInt(orderedMatch[2]);
+        const content = orderedMatch[3];
+
+        // If the list item is empty (only has the marker), exit the list
+        if (content.trim() === '') {
+          const markerLength = orderedMatch[0].length - content.length;
+          const newText =
+            textBeforeCursor.slice(0, -markerLength) + '\n' + textAfterCursor;
+          setInput(newText);
+          setTimeout(() => {
+            textarea.focus();
+            textarea.setSelectionRange(
+              cursorPos - markerLength + 1,
+              cursorPos - markerLength + 1
+            );
+          }, 0);
+          return;
+        }
+
+        // Continue the list with the next number
+        const nextNumber = number + 1;
+        const newText =
+          textBeforeCursor +
+          '\n' +
+          indent +
+          nextNumber +
+          '. ' +
+          textAfterCursor;
+        setInput(newText);
+        setTimeout(() => {
+          textarea.focus();
+          const newPos =
+            cursorPos + indent.length + nextNumber.toString().length + 3;
+          textarea.setSelectionRange(newPos, newPos);
+        }, 0);
+        return;
+      }
+    }
+
+    // Ctrl/Cmd + Enter to send
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault();
+      handleSend(input);
+    }
+
+    // Keyboard shortcuts for text formatting
+    if (e.ctrlKey || e.metaKey) {
+      if (e.key === 'b') {
+        e.preventDefault();
+        insertFormatting('**', '**');
+      } else if (e.key === 'i') {
+        e.preventDefault();
+        insertFormatting('*', '*');
+      } else if (e.key === 'e') {
+        e.preventDefault();
+        insertFormatting('`', '`');
+      } else if (e.key === 'l') {
+        e.preventDefault();
+        insertList('unordered');
+      } else if (e.key === 'o') {
+        e.preventDefault();
+        insertList('ordered');
+      }
+    }
+  };
+
   return (
     <div className={className}>
       <div className="border p-4 rounded-md space-y-2">
         {/* Toolbar */}
         <Toolbar
-          execCommand={execCommand}
+          onInsertFormatting={insertFormatting}
           handleFileAttach={handleFileAttach}
           fileInputRef={fileInputRef}
+          insertList={insertList}
         />
 
         {/* Editor */}
-        <div
-          ref={editorRef}
-          contentEditable
-          className="min-h-[100px] max-h-[200px] overflow-y-auto outline-none focus:ring-0"
-          style={{ whiteSpace: 'pre-wrap' }}
-          onInput={(e) => setInput(e.currentTarget.innerHTML)}
-          data-placeholder="Type your message here"
-        />
+        {!isPreview && (
+          <textarea
+            ref={editorRef}
+            className="h-[100px] w-full overflow-y-auto outline-none focus:ring-0 resize-none"
+            style={{ whiteSpace: 'pre-wrap' }}
+            value={input}
+            onChange={handleInput}
+            onKeyDown={handleKeyDown}
+            disabled={isPreview}
+            data-placeholder="Type your message here"
+          />
+        )}
+
+        {isPreview && (
+          <div
+            dangerouslySetInnerHTML={{ __html: markdownToHtml(input) }}
+            className="h-[100px] overflow-y-auto !mb-3.5"
+          />
+        )}
 
         {/* Attached Files */}
         {attachedFiles.length > 0 && (
@@ -94,7 +301,26 @@ const RichTextEditor: FC<Props> = ({ className }) => {
           </div>
         )}
 
-        <Button onClick={() => handleSend(input)}>Send</Button>
+        <div className="flex gap-1 justify-between">
+          <div>
+            <Button
+              onClick={handleTurnOffPreview}
+              variant={!isPreview ? 'ghost' : 'secondary'}
+              disabled={!isPreview}
+            >
+              Write
+            </Button>
+            <Button
+              onClick={handleTurnOnPreview}
+              variant={isPreview ? 'ghost' : 'secondary'}
+              disabled={isPreview}
+            >
+              Preview
+            </Button>
+          </div>
+
+          <Button onClick={() => handleSend(input)}>Send</Button>
+        </div>
       </div>
     </div>
   );

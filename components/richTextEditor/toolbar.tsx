@@ -1,5 +1,15 @@
 import React, { FC, useRef } from 'react';
 import { Button } from '../ui/button';
+import {
+  BoldIcon,
+  ListIcon,
+  ListOrderedIcon,
+  CodeIcon,
+  FileIcon,
+  LinkIcon,
+  StrikethroughIcon,
+  ItalicIcon,
+} from 'lucide-react';
 
 const ToolbarButton = ({
   children,
@@ -11,76 +21,81 @@ const ToolbarButton = ({
   title: string;
 }) => {
   return (
-    <Button onClick={onClick} variant="ghost" title={title}>
+    <Button onClick={onClick} variant="ghost" size="icon" title={title}>
       {children}
     </Button>
   );
 };
 
 type Props = {
-  execCommand: (command: string, value?: string) => void;
+  onInsertFormatting: (before: string, after: string) => void;
   handleFileAttach: (attachedFiles: FileList) => void;
   fileInputRef: React.RefObject<HTMLInputElement | null>;
+  insertList: (type: 'ordered' | 'unordered') => void;
 };
 
 const Toolbar: FC<Props> = ({
-  execCommand,
+  onInsertFormatting,
   handleFileAttach,
   fileInputRef,
+  insertList,
 }) => {
   return (
     <div>
       <div className="flex gap-2 border-b">
-        <ToolbarButton onClick={() => execCommand('bold')} title="Bold">
-          Bold
-        </ToolbarButton>
-        <ToolbarButton onClick={() => execCommand('italic')} title="Italic">
-          Italic
+        <ToolbarButton
+          onClick={() => onInsertFormatting('**', '**')}
+          title="Bold"
+        >
+          <BoldIcon />
         </ToolbarButton>
         <ToolbarButton
-          onClick={() => execCommand('strikeThrough')}
+          onClick={() => onInsertFormatting('*', '*')}
+          title="Italic"
+        >
+          <ItalicIcon />
+        </ToolbarButton>
+        <ToolbarButton
+          onClick={() => onInsertFormatting('~~', '~~')}
           title="Strikethrough"
         >
-          Strikethrough
+          <StrikethroughIcon />
         </ToolbarButton>
         <ToolbarButton
           onClick={() => {
             const url = prompt('Enter URL:');
             if (url) {
-              execCommand('createLink', url);
+              onInsertFormatting('[', `](${url})`);
             }
           }}
           title="Link"
         >
-          Link
+          <LinkIcon />
         </ToolbarButton>
         <ToolbarButton
-          onClick={() => execCommand('insertUnorderedList')}
+          onClick={() => insertList('unordered')}
           title="Unordered List"
         >
-          Unordered List
+          <ListIcon />
         </ToolbarButton>
         <ToolbarButton
-          onClick={() => execCommand('insertOrderedList')}
+          onClick={() => insertList('ordered')}
           title="Ordered List"
         >
-          Ordered List
+          <ListOrderedIcon />
         </ToolbarButton>
         <ToolbarButton
-          onClick={() => execCommand('justifyCenter')}
-          title="Alignment"
+          onClick={() => onInsertFormatting('`', '`')}
+          title="Code"
         >
-          Align Center
+          <CodeIcon />
         </ToolbarButton>
         <ToolbarButton
           onClick={() => fileInputRef.current?.click()}
           title="Attach File"
         >
-          Attach File
+          <FileIcon />
         </ToolbarButton>
-        {/* <ToolbarButton onClick={codeCommand} title="Code">
-          Code
-        </ToolbarButton> */}
       </div>
 
       <input
