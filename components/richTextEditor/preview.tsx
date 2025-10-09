@@ -19,7 +19,6 @@ type Props = {
 enum FileType {
   IMAGE = 'image',
   PDF = 'application/pdf',
-  DOCX = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   TEXT = 'text',
 }
 
@@ -28,12 +27,6 @@ const getFileType = (type: string) => {
     return FileType.IMAGE;
   } else if (type.startsWith('application/pdf')) {
     return FileType.PDF;
-  } else if (
-    type.startsWith(
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-    )
-  ) {
-    return FileType.DOCX;
   } else if (type.startsWith('text')) {
     return FileType.TEXT;
   }
@@ -55,11 +48,6 @@ const Preview: FC<Props> = ({ file }) => {
         return (
           <iframe src={URL.createObjectURL(file)} className="w-full h-full" />
         );
-      // Can not view without lib
-      case FileType.DOCX:
-        return (
-          <iframe src={URL.createObjectURL(file)} className="w-full h-full" />
-        );
       case FileType.TEXT:
         return (
           <iframe src={URL.createObjectURL(file)} className="w-full h-full" />
@@ -72,7 +60,7 @@ const Preview: FC<Props> = ({ file }) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="icon">
+        <Button size="icon">
           <EyeIcon />
         </Button>
       </DialogTrigger>

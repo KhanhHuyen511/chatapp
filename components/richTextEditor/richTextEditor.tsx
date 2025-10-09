@@ -22,6 +22,8 @@ const RichTextEditor: FC<Props> = ({ className }) => {
   const [isPreview, setIsPreview] = useState(false);
 
   const handleSend = (message: string) => {
+    if (isInputEmpty()) return;
+
     addMessage({
       id: crypto.randomUUID(),
       content: message,
@@ -42,6 +44,7 @@ const RichTextEditor: FC<Props> = ({ className }) => {
     if (editorRef.current) {
       editorRef.current.innerHTML = '';
     }
+    setIsPreview(false);
   };
 
   const insertFormatting = (before: string, after: string) => {
@@ -116,6 +119,32 @@ const RichTextEditor: FC<Props> = ({ className }) => {
     }, 0);
   };
 
+  const insertAlignment = (
+    alignment: 'left' | 'center' | 'right' | 'justify' = 'center'
+  ) => {
+    const textarea = editorRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = input.substring(start, end);
+
+    const newText =
+      input.substring(0, start) +
+      `[${alignment}]` +
+      selectedText +
+      `[/${alignment}]` +
+      input.substring(end);
+
+    setInput(newText);
+
+    // Set cursor position
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start, start + selectedText.length + 8);
+    }, 0);
+  };
+
   const handleFileAttach = (attachedFiles: FileList) => {
     setAttachedFiles((prev) => [...prev, ...Array.from(attachedFiles)]);
   };
@@ -140,6 +169,10 @@ const RichTextEditor: FC<Props> = ({ className }) => {
     setInput(e.currentTarget.value || '');
   };
 
+  const isInputEmpty = () => {
+    return input.trim() === '' && attachedFiles.length === 0;
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
       const textarea = editorRef.current;
@@ -160,7 +193,6 @@ const RichTextEditor: FC<Props> = ({ className }) => {
         const indent = unorderedMatch[1];
         const content = unorderedMatch[2];
 
-        // If the list item is empty (only has the marker), exit the list
         if (content.trim() === '') {
           const newText =
             textBeforeCursor.slice(0, -2) + '\n' + textAfterCursor;
@@ -172,7 +204,6 @@ const RichTextEditor: FC<Props> = ({ className }) => {
           return;
         }
 
-        // Continue the list with a new marker
         const newText =
           textBeforeCursor + '\n' + indent + '- ' + textAfterCursor;
         setInput(newText);
@@ -184,7 +215,6 @@ const RichTextEditor: FC<Props> = ({ className }) => {
         return;
       }
 
-      // Check for ordered list (1. , 2. , etc.)
       const orderedMatch = currentLine.match(/^(\s*)(\d+)\. (.*)$/);
       if (orderedMatch) {
         e.preventDefault();
@@ -192,7 +222,6 @@ const RichTextEditor: FC<Props> = ({ className }) => {
         const number = Number.parseInt(orderedMatch[2]);
         const content = orderedMatch[3];
 
-        // If the list item is empty (only has the marker), exit the list
         if (content.trim() === '') {
           const markerLength = orderedMatch[0].length - content.length;
           const newText =
@@ -208,7 +237,6 @@ const RichTextEditor: FC<Props> = ({ className }) => {
           return;
         }
 
-        // Continue the list with the next number
         const nextNumber = number + 1;
         const newText =
           textBeforeCursor +
@@ -228,13 +256,11 @@ const RichTextEditor: FC<Props> = ({ className }) => {
       }
     }
 
-    // Ctrl/Cmd + Enter to send
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
       e.preventDefault();
       handleSend(input);
     }
 
-    // Keyboard shortcuts for text formatting
     if (e.ctrlKey || e.metaKey) {
       if (e.key === 'b') {
         e.preventDefault();
@@ -257,13 +283,14 @@ const RichTextEditor: FC<Props> = ({ className }) => {
 
   return (
     <div className={className}>
-      <div className="border p-4 rounded-md space-y-2">
+      <div className="border px-4 pb-4 pt-2 rounded-xl space-y-2">
         {/* Toolbar */}
         <Toolbar
           onInsertFormatting={insertFormatting}
           handleFileAttach={handleFileAttach}
           fileInputRef={fileInputRef}
           insertList={insertList}
+          insertAlignment={insertAlignment}
         />
 
         {/* Editor */}
@@ -319,7 +346,9 @@ const RichTextEditor: FC<Props> = ({ className }) => {
             </Button>
           </div>
 
-          <Button onClick={() => handleSend(input)}>Send</Button>
+          <Button onClick={() => handleSend(input)} disabled={isInputEmpty()}>
+            Send
+          </Button>
         </div>
       </div>
     </div>

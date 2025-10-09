@@ -1,7 +1,8 @@
 'use client';
 
-import Bubble from '@/components/bubble';
+import Bubble from '@/components/richTextEditor/bubble';
 import RichTextEditor from '@/components/richTextEditor/richTextEditor';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ChatProvider, useChat } from '@/contexts/chatContext';
 
 export default function Home() {
@@ -10,11 +11,11 @@ export default function Home() {
   return (
     <div className="w-2xl mx-auto space-y-4 h-screen flex flex-col">
       <div className="sticky top-0 left-0 right-0 border-b bg-white p-4">
-        <h1 className="text-2xl font-bold">Chat App</h1>
-
-        <div>
-          <p>User A</p>
-          <p>Online</p>
+        <div className="flex items-center gap-2">
+          <Avatar>
+            <AvatarFallback className="bg-blue-200">A</AvatarFallback>
+          </Avatar>
+          <p className="text-sm font-bold">User A</p>
         </div>
       </div>
 

@@ -9,7 +9,12 @@ import {
   LinkIcon,
   StrikethroughIcon,
   ItalicIcon,
+  AlignLeftIcon,
+  AlignCenterIcon,
+  AlignRightIcon,
+  AlignJustifyIcon,
 } from 'lucide-react';
+import { Separator } from '../ui/separator';
 
 const ToolbarButton = ({
   children,
@@ -32,6 +37,7 @@ type Props = {
   handleFileAttach: (attachedFiles: FileList) => void;
   fileInputRef: React.RefObject<HTMLInputElement | null>;
   insertList: (type: 'ordered' | 'unordered') => void;
+  insertAlignment: (alignment: 'left' | 'center' | 'right' | 'justify') => void;
 };
 
 const Toolbar: FC<Props> = ({
@@ -39,10 +45,12 @@ const Toolbar: FC<Props> = ({
   handleFileAttach,
   fileInputRef,
   insertList,
+  insertAlignment,
 }) => {
   return (
     <div>
-      <div className="flex gap-2 border-b">
+      <div className="flex items-center gap-1 pb-1 border-b">
+        {/* Formatting */}
         <ToolbarButton
           onClick={() => onInsertFormatting('**', '**')}
           title="Bold"
@@ -61,6 +69,10 @@ const Toolbar: FC<Props> = ({
         >
           <StrikethroughIcon />
         </ToolbarButton>
+
+        <Separator orientation="vertical" className="!h-5" />
+
+        {/* List */}
         <ToolbarButton
           onClick={() => {
             const url = prompt('Enter URL:');
@@ -84,12 +96,46 @@ const Toolbar: FC<Props> = ({
         >
           <ListOrderedIcon />
         </ToolbarButton>
+
+        <Separator orientation="vertical" className="!h-5" />
+
+        {/* Alignment */}
+        <ToolbarButton
+          onClick={() => insertAlignment('left')}
+          title="Align Left"
+        >
+          <AlignLeftIcon />
+        </ToolbarButton>
+        <ToolbarButton
+          onClick={() => insertAlignment('center')}
+          title="Align Center"
+        >
+          <AlignCenterIcon />
+        </ToolbarButton>
+        <ToolbarButton
+          onClick={() => insertAlignment('right')}
+          title="Align Right"
+        >
+          <AlignRightIcon />
+        </ToolbarButton>
+        <ToolbarButton
+          onClick={() => insertAlignment('justify')}
+          title="Justify"
+        >
+          <AlignJustifyIcon />
+        </ToolbarButton>
+
+        <Separator orientation="vertical" className="!h-5" />
+
+        {/* Code */}
         <ToolbarButton
           onClick={() => onInsertFormatting('`', '`')}
           title="Code"
         >
           <CodeIcon />
         </ToolbarButton>
+
+        {/* Attach File */}
         <ToolbarButton
           onClick={() => fileInputRef.current?.click()}
           title="Attach File"
@@ -102,6 +148,7 @@ const Toolbar: FC<Props> = ({
         ref={fileInputRef}
         type="file"
         multiple
+        accept="image/*,application/*,text/*"
         onChange={(e) => {
           if (e.target.files) {
             handleFileAttach(e.target.files);
