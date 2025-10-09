@@ -15,6 +15,7 @@ import {
   AlignJustifyIcon,
 } from 'lucide-react';
 import { Separator } from '../ui/separator';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 
 const ToolbarButton = ({
   children,
@@ -26,9 +27,14 @@ const ToolbarButton = ({
   title: string;
 }) => {
   return (
-    <Button onClick={onClick} variant="ghost" size="icon" title={title}>
-      {children}
-    </Button>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button onClick={onClick} variant="ghost" size="icon">
+          {children}
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent>{title}</TooltipContent>
+    </Tooltip>
   );
 };
 
