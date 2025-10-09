@@ -49,7 +49,7 @@ const Toolbar: FC<Props> = ({
 }) => {
   return (
     <div>
-      <div className="flex items-center gap-1 pb-1 border-b">
+      <div className="flex items-center gap-1 pb-1 border-b overflow-x-auto">
         {/* Formatting */}
         <ToolbarButton
           onClick={() => onInsertFormatting('**', '**')}

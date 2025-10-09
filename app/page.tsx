@@ -9,7 +9,7 @@ export default function Home() {
   const { messages } = useChat();
 
   return (
-    <div className="w-2xl mx-auto space-y-4 h-screen flex flex-col">
+    <div className="w-full max-w-2xl mx-auto space-y-4 h-screen flex flex-col">
       <div className="sticky top-0 left-0 right-0 border-b bg-white p-4">
         <div className="flex items-center gap-2">
           <Avatar>
@@ -19,20 +19,22 @@ export default function Home() {
         </div>
       </div>
 
-      <ul className="flex-1 overflow-y-auto flex flex-col gap-2">
-        {messages.map((message) => (
-          <Bubble
-            key={message.id}
-            content={message.content}
-            attachments={message.attachments}
-            createdAt={message.createdAt}
-            createdBy={message.createdBy}
-          />
-        ))}
-      </ul>
+      <div className="flex-1 p-4 overflow-y-auto flex flex-col">
+        <ul className="flex-1 overflow-y-auto flex flex-col gap-2">
+          {messages.map((message) => (
+            <Bubble
+              key={message.id}
+              content={message.content}
+              attachments={message.attachments}
+              createdAt={message.createdAt}
+              createdBy={message.createdBy}
+            />
+          ))}
+        </ul>
 
-      {/* Editor */}
-      <RichTextEditor className="py-4" />
+        {/* Editor */}
+        <RichTextEditor className="py-4" />
+      </div>
     </div>
   );
 }
