@@ -7,13 +7,21 @@ import Preview from './preview';
 import { cn } from '@/lib/utils';
 
 type Props = {
-  file: File;
+  file: File | string;
   index: number;
   handleRemoveFile?: (index: number) => void;
 };
 
 const Attachment: FC<Props> = ({ file, index, handleRemoveFile }) => {
   const [imgSrc, setImgSrc] = useState<string | null>(null);
+
+  if (typeof file === 'string') {
+    return (
+      <div className="inline-flex flex-col items-center justify-between bg-gray-100 rounded-md w-24 h-24 group relative">
+        <p className="text-xs p-4 space-y-2 w-full overflow-hidden">{file}</p>
+      </div>
+    );
+  }
 
   useEffect(() => {
     if (file.type.startsWith('image')) {

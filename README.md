@@ -12,6 +12,8 @@ A messaging app I built with rich text editing, file attachments, and reactions.
 - **Lucide React** - Icons
 - **Day.js** - Date formatting
 - **Custom Markdown Parser** - Built my own instead of using external libraries
+- **SQLite** - Local database with Drizzle ORM
+- **Drizzle Kit** - Database migrations and schema management
 
 ## Features I Built
 
@@ -46,20 +48,67 @@ A messaging app I built with rich text editing, file attachments, and reactions.
    pnpm install
    ```
 
-2. **Start the dev server:**
+2. **Set up environment variables:**
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   Edit the `.env` file with your configuration:
+
+   ```env
+   # Database Configuration
+   DB_FILE_NAME=local.db
+   ```
+
+3. **Set up the database:**
+
+   ```bash
+   # Generate database migrations
+   pnpm db:generate
+
+   # Run database migrations
+   pnpm db:migrate
+   ```
+
+4. **Start the dev server:**
 
    ```bash
    pnpm dev
    ```
 
-3. **Open your browser:**
+5. **Open your browser:**
    ```
    http://localhost:3000
    ```
 
+### Environment Variables
+
+The app requires a `.env` file with the following variables:
+
+- `DB_FILE_NAME` - Path to your SQLite database file (default: `local.db`)
+
+Copy `.env.example` to `.env` and update the values as needed.
+
+### Database Schema
+
+The app uses SQLite with Drizzle ORM and includes these tables:
+
+- **users_table** - User information (id, name)
+- **messages_table** - Chat messages (id, content, reaction, createdAt, createdBy)
+- **attachments_table** - File attachments (id, messageId, fileName, fileType, fileSize, filePath, mimeType, createdAt)
+
 ### Build for Production
 
 ```bash
+# Set up environment variables
+cp .env.example .env
+
+# Generate and run database migrations
+pnpm db:generate
+pnpm db:migrate
+
+# Build the application
 pnpm build
 pnpm start
 ```

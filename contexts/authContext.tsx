@@ -1,11 +1,13 @@
 'use client';
 
+import { createUser } from '@/actions/users';
 import { User } from '@/lib/types/user';
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useState } from 'react';
 
 type AuthContextType = {
   user: User | null;
   setUser: (user: User | null) => void;
+  login: (name: string) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -13,16 +15,14 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
 
-  // TODO: Replace with actual auth logic
-  useEffect(() => {
-    setUser({
-      id: '1',
-      name: 'userA',
-    });
-  }, []);
+  const login = async (name: string) => {
+    const user = await createUser(name);
+
+    setUser(user);
+  };
 
   return (
-    <AuthContext.Provider value={{ user, setUser }}>
+    <AuthContext.Provider value={{ user, setUser, login }}>
       {children}
     </AuthContext.Provider>
   );

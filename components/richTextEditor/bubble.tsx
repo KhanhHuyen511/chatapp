@@ -30,7 +30,9 @@ const Bubble: FC<Props> = ({ message }) => {
     <div className="flex items-start gap-2">
       {!isMyMessage && (
         <Avatar>
-          <AvatarFallback>{createdBy.name.charAt(0)}</AvatarFallback>
+          <AvatarFallback className="uppercase">
+            {createdBy?.name?.charAt(0) || 'A'}
+          </AvatarFallback>
         </Avatar>
       )}
 
@@ -60,9 +62,9 @@ const Bubble: FC<Props> = ({ message }) => {
 
           {/* Attachments */}
           {attachments && attachments.length > 0 && (
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 text-primary">
               {attachments.map((file, index) => (
-                <Attachment key={file.name} file={file} index={index} />
+                <Attachment key={index} file={file} index={index} />
               ))}
             </div>
           )}
@@ -86,7 +88,7 @@ const Bubble: FC<Props> = ({ message }) => {
           )}
         >
           {/* Reactions */}
-          <Reactions messageId={id} reaction={reaction} />
+          <Reactions message={message} reaction={reaction} />
 
           {/* Edit and delete message */}
           {isMyMessage && (

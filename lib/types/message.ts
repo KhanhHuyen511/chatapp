@@ -9,3 +9,9 @@ export type Message = {
   createdBy: User;
   reaction?: ReactionTypes;
 };
+
+export type CreateMessageParams = {
+  content: string;
+  reaction?: ReactionTypes;
+  attachments?: File[];
+};

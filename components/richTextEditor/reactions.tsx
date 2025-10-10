@@ -8,9 +8,10 @@ import {
 } from 'lucide-react';
 import { ReactionTypes } from '@/lib/constant/reactions';
 import { useChat } from '@/contexts/chatContext';
+import { Message } from '@/lib/types/message';
 
 type Props = {
-  messageId: string;
+  message: Message;
   reaction?: ReactionTypes;
 };
 
@@ -33,7 +34,7 @@ const ReactionButtons = [
   },
 ];
 
-const Reactions: FC<Props> = ({ messageId, reaction }) => {
+const Reactions: FC<Props> = ({ message, reaction }) => {
   const { addReaction } = useChat();
 
   return (
@@ -43,7 +44,12 @@ const Reactions: FC<Props> = ({ messageId, reaction }) => {
           variant={reaction && reaction === item.reaction ? 'default' : 'ghost'}
           size="icon-sm"
           key={item.reaction}
-          onClick={() => addReaction(messageId, item.reaction)}
+          onClick={() =>
+            addReaction(
+              message,
+              reaction === item.reaction ? undefined : item.reaction
+            )
+          }
         >
           <item.icon />
         </Button>

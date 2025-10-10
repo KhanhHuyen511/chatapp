@@ -6,13 +6,15 @@ import { useChat } from '@/contexts/chatContext';
 import Toolbar from './toolbar';
 import Attachment from './attachment';
 import { markdownToHtml } from '@/lib/utils/markdown';
-import { Message } from '@/lib/types/message';
+import { CreateMessageParams, Message } from '@/lib/types/message';
 import { useTextEditor } from '@/hooks/useTextEditor';
 import { useFileAttachments } from '@/hooks/useFileAttachments';
 import { usePreview } from '@/hooks/usePreview';
+import { useAuth } from '@/contexts/authContext';
 import { cn } from '@/lib/utils';
 
 const RichTextEditor = () => {
+  const { user } = useAuth();
   const { addMessage, editingMessage, editMessage, setEditingMessage } =
     useChat();
 
@@ -33,6 +35,10 @@ const RichTextEditor = () => {
   const handleSend = (message: string) => {
     if (isInputEmpty() && isAttachmentsEmpty()) return;
 
+    if (!user) {
+      throw new Error('User not found');
+    }
+
     if (editingMessage) {
       editMessage({
         ...editingMessage,
@@ -40,15 +46,12 @@ const RichTextEditor = () => {
         attachments: attachedFiles,
       });
     } else {
-      const newMessage: Message = {
-        id: crypto.randomUUID(),
+      const newMessage: CreateMessageParams = {
         content: message,
-        createdAt: new Date().toISOString(),
-        createdBy: { id: '1', name: 'User A' },
-        attachments: attachedFiles,
+        ...(attachedFiles.length > 0 && { attachments: attachedFiles }),
       };
 
-      addMessage(newMessage);
+      addMessage(newMessage as Message, user);
     }
 
     handleReset();
@@ -132,7 +135,7 @@ const RichTextEditor = () => {
         <div className="flex flex-wrap gap-2">
           {attachedFiles.map((file, index) => (
             <Attachment
-              key={file.name}
+              key={index}
               file={file}
               index={index}
               handleRemoveFile={handleRemoveFile}
