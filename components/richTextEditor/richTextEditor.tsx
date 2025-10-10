@@ -1,18 +1,20 @@
 'use client';
 
-import React, { FC, useRef, useState } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import { Button } from '../ui/button';
 import { useChat } from '@/contexts/chatContext';
 import Toolbar from './toolbar';
 import Attachment from './attachment';
 import { markdownToHtml } from '@/lib/utils/markdown';
+import { Message } from '@/lib/types/message';
 
 type Props = {
   className?: string;
 };
 
 const RichTextEditor: FC<Props> = ({ className }) => {
-  const { addMessage } = useChat();
+  const { addMessage, editingMessage, editMessage, setEditingMessage } =
+    useChat();
 
   const [input, setInput] = useState('');
   const editorRef = useRef<HTMLTextAreaElement>(null);
@@ -21,16 +23,34 @@ const RichTextEditor: FC<Props> = ({ className }) => {
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const [isPreview, setIsPreview] = useState(false);
 
+  // Set input and attached files when editing message
+  useEffect(() => {
+    if (editingMessage) {
+      setInput(editingMessage.content);
+      setAttachedFiles(editingMessage.attachments || []);
+    }
+  }, [editingMessage]);
+
   const handleSend = (message: string) => {
     if (isInputEmpty()) return;
 
-    addMessage({
-      id: crypto.randomUUID(),
-      content: message,
-      createdAt: new Date().toISOString(),
-      createdBy: { id: '1', name: 'User A' },
-      attachments: attachedFiles,
-    });
+    if (editingMessage) {
+      editMessage({
+        ...editingMessage,
+        content: message,
+        attachments: attachedFiles,
+      });
+    } else {
+      const newMessage: Message = {
+        id: crypto.randomUUID(),
+        content: message,
+        createdAt: new Date().toISOString(),
+        createdBy: { id: '1', name: 'User A' },
+        attachments: attachedFiles,
+      };
+
+      addMessage(newMessage);
+    }
 
     handleReset();
   };
@@ -305,6 +325,20 @@ const RichTextEditor: FC<Props> = ({ className }) => {
     }
   };
 
+  const handleCancelEditing = () => {
+    setEditingMessage(null);
+    setInput('');
+    setAttachedFiles([]);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+    if (editorRef.current) {
+      editorRef.current.innerHTML = '';
+    }
+    setIsPreview(false);
+    editorRef.current?.focus();
+  };
+
   return (
     <div className={className}>
       <div className="border px-4 pb-4 pt-2 rounded-xl space-y-2">
@@ -371,9 +405,16 @@ const RichTextEditor: FC<Props> = ({ className }) => {
             </Button>
           </div>
 
-          <Button onClick={() => handleSend(input)} disabled={isInputEmpty()}>
-            Send
-          </Button>
+          <div className="flex gap-1">
+            {editingMessage && (
+              <Button variant="ghost" onClick={() => handleCancelEditing()}>
+                Cancel
+              </Button>
+            )}
+            <Button onClick={() => handleSend(input)} disabled={isInputEmpty()}>
+              {editingMessage ? 'Save' : 'Send'}
+            </Button>
+          </div>
         </div>
       </div>
     </div>

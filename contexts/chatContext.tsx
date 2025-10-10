@@ -7,12 +7,17 @@ type ChatContextType = {
   messages: Message[];
   setMessages: (messages: Message[]) => void;
   addMessage: (message: Message) => void;
+  editMessage: (message: Message) => void;
+  editingMessage: Message | null;
+  setEditingMessage: (message: Message | null) => void;
+  deleteMessage: (id: string) => void;
 };
 
 const ChatContext = createContext<ChatContextType | null>(null);
 
 export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   const [messages, setMessages] = useState<Message[]>([]);
+  const [editingMessage, setEditingMessage] = useState<Message | null>(null);
 
   const addMessage = (message: Message) => {
     setMessages((prev) => [...prev, message]);
@@ -29,8 +34,28 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     }, 300);
   };
 
+  const editMessage = (message: Message) => {
+    const { id } = message;
+    setMessages((prev) => prev.map((m) => (m.id === id ? message : m)));
+    setEditingMessage(null);
+  };
+
+  const deleteMessage = (id: string) => {
+    setMessages((prev) => prev.filter((m) => m.id !== id));
+  };
+
   return (
-    <ChatContext.Provider value={{ messages, setMessages, addMessage }}>
+    <ChatContext.Provider
+      value={{
+        messages,
+        setMessages,
+        addMessage,
+        editMessage,
+        deleteMessage,
+        editingMessage,
+        setEditingMessage,
+      }}
+    >
       {children}
     </ChatContext.Provider>
   );

@@ -22,13 +22,7 @@ export default function Home() {
       <div className="flex-1 p-4 overflow-y-auto flex flex-col">
         <ul className="flex-1 overflow-y-auto flex flex-col gap-2">
           {messages.map((message) => (
-            <Bubble
-              key={message.id}
-              content={message.content}
-              attachments={message.attachments}
-              createdAt={message.createdAt}
-              createdBy={message.createdBy}
-            />
+            <Bubble key={message.id} message={message} />
           ))}
         </ul>
 
