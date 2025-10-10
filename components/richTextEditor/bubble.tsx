@@ -22,8 +22,7 @@ type Props = {
 const Bubble: FC<Props> = ({ message }) => {
   const { id, content, attachments, createdAt, createdBy, reaction } = message;
   const { user } = useAuth();
-  const { editMessage, deleteMessage, editingMessage, setEditingMessage } =
-    useChat();
+  const { deleteMessage, setEditingMessage } = useChat();
 
   const isMyMessage = user?.id === createdBy.id;
 
@@ -47,8 +46,10 @@ const Bubble: FC<Props> = ({ message }) => {
 
         <div
           className={cn(
-            'rounded-md p-2',
-            user?.id === createdBy.id ? 'bg-blue-100' : 'bg-gray-100'
+            'rounded-xl px-3 py-2',
+            user?.id === createdBy.id
+              ? 'bg-primary text-primary-foreground'
+              : 'bg-gray-100'
           )}
         >
           {/* Content */}

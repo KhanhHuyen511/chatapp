@@ -15,18 +15,20 @@ export default function Home() {
   }, [messages]);
 
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-4 h-screen flex flex-col">
-      <div className="sticky top-0 left-0 right-0 border-b bg-white p-4">
+    <div className="w-full max-w-2xl mx-auto space-y-4 h-screen flex flex-col bg-background">
+      <div className="sticky top-0 left-0 right-0 border-b bg-white p-4 lg:px-8 z-10">
         <div className="flex items-center gap-2">
-          <Avatar>
-            <AvatarFallback className="bg-blue-200">A</AvatarFallback>
+          <Avatar className="size-10">
+            <AvatarFallback className="bg-primary text-primary-foreground">
+              A
+            </AvatarFallback>
           </Avatar>
           <p className="text-sm font-bold">User A</p>
         </div>
       </div>
 
-      <div className="flex-1 p-4 overflow-y-auto flex flex-col">
-        <ul className="flex-1 overflow-y-auto flex flex-col gap-2">
+      <div className="flex-1 p-4 lg:p-8 flex flex-col bg-background">
+        <ul className="flex-1 flex flex-col gap-2 pb-8">
           {messages.map((message) => (
             <Bubble key={message.id} message={message} />
           ))}
@@ -34,7 +36,9 @@ export default function Home() {
         </ul>
 
         {/* Editor */}
-        <RichTextEditor className="py-4" />
+        <div className="z-10 sticky bottom-0 left-0 right-0 bg-background">
+          <RichTextEditor />
+        </div>
       </div>
     </div>
   );
