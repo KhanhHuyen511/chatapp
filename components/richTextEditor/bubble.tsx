@@ -78,7 +78,12 @@ const Bubble: FC<Props> = ({ message }) => {
         </div>
 
         {reaction && (
-          <div className="bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center shadow p-0.25 absolute -bottom-4 left-0">
+          <div
+            className={cn(
+              'bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center shadow p-0.25 absolute -bottom-4',
+              isMyMessage ? 'right-0' : 'left-0'
+            )}
+          >
             {renderReaction(reaction)}
           </div>
         )}
