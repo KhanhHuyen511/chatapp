@@ -3,7 +3,7 @@
 import Bubble from '@/components/richTextEditor/bubble';
 import RichTextEditor from '@/components/richTextEditor/richTextEditor';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { ChatProvider, useChat } from '@/contexts/chatContext';
+import { useChat } from '@/contexts/chatContext';
 import { useEffect, useRef } from 'react';
 
 export default function Home() {

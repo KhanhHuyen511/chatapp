@@ -1,26 +1,16 @@
 'use client';
 
 import { useAuth } from '@/contexts/authContext';
-import { User } from '@/lib/types/user';
 import { cn } from '@/lib/utils';
 import React, { FC } from 'react';
 import Attachment from './attachment';
 import { markdownToHtml } from '@/lib/utils/markdown';
 import dayjs from 'dayjs';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Avatar, AvatarFallback } from '../ui/avatar';
 import { Button } from '../ui/button';
-import {
-  FrownIcon,
-  HeartIcon,
-  LaughIcon,
-  MessageCircleHeartIcon,
-  PencilIcon,
-  ThumbsUpIcon,
-  XIcon,
-} from 'lucide-react';
+import { PencilIcon, XIcon } from 'lucide-react';
 import { useChat } from '@/contexts/chatContext';
 import { Message } from '@/lib/types/message';
-import RichTextEditor from './richTextEditor';
 import { Separator } from '../ui/separator';
 import Reactions from './reactions';
 import { renderReaction } from '@/lib/utils/reactions';

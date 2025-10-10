@@ -6,10 +6,8 @@ import {
   LaughIcon,
   FrownIcon,
 } from 'lucide-react';
-import { Message } from '@/lib/types/message';
 import { ReactionTypes } from '@/lib/constant/reactions';
 import { useChat } from '@/contexts/chatContext';
-import { cn } from '@/lib/utils';
 
 type Props = {
   messageId: string;

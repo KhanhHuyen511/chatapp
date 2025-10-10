@@ -2,9 +2,8 @@
 
 import React, { FC, useEffect, useState } from 'react';
 import { Button } from '../ui/button';
-import { EyeIcon, PaperclipIcon, XIcon } from 'lucide-react';
+import { PaperclipIcon, XIcon } from 'lucide-react';
 import Preview from './preview';
-import Image from 'next/image';
 import { cn } from '@/lib/utils';
 
 type Props = {
