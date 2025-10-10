@@ -27,9 +27,7 @@ A messaging app I built with rich text editing, file attachments, and reactions.
 
 - ✅ **Message Reactions** - Like, love, laugh, sad emoji reactions
 - ✅ **Keyboard Shortcuts** - Ctrl+B (bold), Ctrl+I (italic), Ctrl+E (code), Ctrl+L (lists), Ctrl+Enter (send)
-- ✅ **Smart Lists** - Auto-continue ordered and unordered lists
 - ✅ **Clipboard Support** - Paste images and auto-format URLs
-- ✅ **User Avatars** - Show who sent what with timestamps
 
 ## How to Run It
 
