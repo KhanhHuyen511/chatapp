@@ -96,36 +96,12 @@ A messaging app I built with rich text editing, file attachments, and reactions.
    - Reply kalen
    ```
 
-### Environment Variables
-
-The app requires a `.env` file with the following variables:
-
-- `DB_FILE_NAME` - Path to your SQLite database file (default: `local.db`)
-
-Copy `.env.example` to `.env` and update the values as needed.
-
 ### Database Schema
 
 The app uses SQLite with Drizzle ORM and includes these tables:
 
 - **users_table** - User information (id, name)
 - **messages_table** - Chat messages (id, content, reaction, createdAt, createdBy)
-- **attachments_table** - File attachments (id, messageId, fileName, fileType, fileSize, filePath, mimeType, createdAt)
-
-### Build for Production
-
-```bash
-# Set up environment variables
-cp .env.example .env
-
-# Generate and run database migrations
-pnpm db:generate
-pnpm db:migrate
-
-# Build the application
-pnpm build
-pnpm start
-```
 
 ## License
 
