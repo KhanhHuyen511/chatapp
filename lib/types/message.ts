@@ -1,3 +1,4 @@
+import { ReactionTypes } from '../constant/reactions';
 import { User } from './user';
 
 export type Message = {
@@ -6,4 +7,5 @@ export type Message = {
   attachments?: File[];
   createdAt: string;
   createdBy: User;
+  reaction?: ReactionTypes;
 };

@@ -1,5 +1,6 @@
 'use client';
 
+import { ReactionTypes } from '@/lib/constant/reactions';
 import { Message } from '@/lib/types/message';
 import { createContext, useContext, useState } from 'react';
 
@@ -11,6 +12,7 @@ type ChatContextType = {
   editingMessage: Message | null;
   setEditingMessage: (message: Message | null) => void;
   deleteMessage: (id: string) => void;
+  addReaction: (messageId: string, reaction: ReactionTypes) => void;
 };
 
 const ChatContext = createContext<ChatContextType | null>(null);
@@ -44,6 +46,16 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     setMessages((prev) => prev.filter((m) => m.id !== id));
   };
 
+  const addReaction = (messageId: string, reaction: ReactionTypes) => {
+    setMessages((prev) =>
+      prev.map((m) =>
+        m.id === messageId
+          ? { ...m, reaction: m.reaction === reaction ? undefined : reaction }
+          : m
+      )
+    );
+  };
+
   return (
     <ChatContext.Provider
       value={{
@@ -54,6 +66,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
         deleteMessage,
         editingMessage,
         setEditingMessage,
+        addReaction,
       }}
     >
       {children}
