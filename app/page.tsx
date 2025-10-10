@@ -4,9 +4,15 @@ import Bubble from '@/components/richTextEditor/bubble';
 import RichTextEditor from '@/components/richTextEditor/richTextEditor';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ChatProvider, useChat } from '@/contexts/chatContext';
+import { useEffect, useRef } from 'react';
 
 export default function Home() {
   const { messages } = useChat();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   return (
     <div className="w-full max-w-2xl mx-auto space-y-4 h-screen flex flex-col">
@@ -24,6 +30,7 @@ export default function Home() {
           {messages.map((message) => (
             <Bubble key={message.id} message={message} />
           ))}
+          <div ref={messagesEndRef} />
         </ul>
 
         {/* Editor */}
