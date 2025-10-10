@@ -50,15 +50,11 @@ A messaging app I built with rich text editing, file attachments, and reactions.
 
 2. **Set up environment variables:**
 
-   ```bash
-   cp .env.example .env
-   ```
-
-   Edit the `.env` file with your configuration:
+   Create .env file at root folder:
 
    ```env
-   # Database Configuration
-   DB_FILE_NAME=local.db
+   DB_FILE_NAME="file:./local.db"
+   NEXT_PUBLIC_API_URL=http://localhost:3000
    ```
 
 3. **Set up the database:**
@@ -78,8 +74,22 @@ A messaging app I built with rich text editing, file attachments, and reactions.
    ```
 
 5. **Open your browser:**
+
    ```
    http://localhost:3000
+   ```
+
+6. **Login by name:**
+
+   ```
+   kalen
+   ```
+
+7. **Login by other name:**
+   ```
+   - To view messages from `kalen`
+   - Reply kalen
+   - Every time reload -> login again -> old chat will be displayed
    ```
 
 ### Environment Variables
