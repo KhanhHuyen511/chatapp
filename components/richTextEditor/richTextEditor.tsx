@@ -10,6 +10,7 @@ import { Message } from '@/lib/types/message';
 import { useTextEditor } from '@/hooks/useTextEditor';
 import { useFileAttachments } from '@/hooks/useFileAttachments';
 import { usePreview } from '@/hooks/usePreview';
+import { cn } from '@/lib/utils';
 
 const RichTextEditor = () => {
   const { addMessage, editingMessage, editMessage, setEditingMessage } =
@@ -114,6 +115,7 @@ const RichTextEditor = () => {
           onPaste={handlePaste}
           onKeyDown={handleKeyDown}
           disabled={isPreview}
+          placeholder="Type your message here"
           data-placeholder="Type your message here"
         />
       )}
@@ -144,6 +146,7 @@ const RichTextEditor = () => {
           <Button
             onClick={handleTurnOffPreview}
             variant={!isPreview ? 'ghost' : 'secondary'}
+            className={cn('disabled:opacity-100', isPreview && 'opacity-50')}
             disabled={!isPreview}
           >
             Write
@@ -151,18 +154,21 @@ const RichTextEditor = () => {
           <Button
             onClick={handleTurnOnPreview}
             variant={isPreview ? 'ghost' : 'secondary'}
+            className={cn('disabled:opacity-100', !isPreview && 'opacity-50')}
             disabled={isPreview}
           >
             Preview
           </Button>
         </div>
 
-        <div className="flex gap-1">
+        <div className="flex gap-2 items-center ">
+          <small className="text-xs text-gray-500">(Ctrl + Enter)</small>
           {editingMessage && (
             <Button variant="ghost" onClick={() => handleCancelEditing()}>
               Cancel
             </Button>
           )}
+
           <Button
             onClick={() => handleSend(input)}
             disabled={isInputEmpty() && isAttachmentsEmpty()}
