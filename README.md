@@ -12,6 +12,8 @@ A messaging app I built with rich text editing, file attachments, and reactions.
 - **Lucide React** - Icons
 - **Day.js** - Date formatting
 - **Custom Markdown Parser** - Built my own instead of using external libraries
+- **SQLite** - Local database with Drizzle ORM
+- **Drizzle Kit** - Database migrations and schema management
 
 ## Features I Built
 
@@ -28,6 +30,11 @@ A messaging app I built with rich text editing, file attachments, and reactions.
 - ✅ **Message Reactions** - Like, love, laugh, sad emoji reactions
 - ✅ **Keyboard Shortcuts** - Ctrl+B (bold), Ctrl+I (italic), Ctrl+E (code), Ctrl+L (lists), Ctrl+Enter (send)
 - ✅ **Clipboard Support** - Paste images and auto-format URLs
+
+## Note
+
+- Every time reload -> login again -> old chat will be displayed
+- Not support send attachments -> reload -> old attachments not stored
 
 ## How to Run It
 
@@ -46,23 +53,55 @@ A messaging app I built with rich text editing, file attachments, and reactions.
    pnpm install
    ```
 
-2. **Start the dev server:**
+2. **Set up environment variables:**
+
+   Create .env file at root folder:
+
+   ```env
+   DB_FILE_NAME="file:./local.db"
+   NEXT_PUBLIC_API_URL=http://localhost:3000
+   ```
+
+3. **Set up the database:**
+
+   ```bash
+   # Generate database migrations
+   pnpm db:generate
+
+   # Run database migrations
+   pnpm db:migrate
+   ```
+
+4. **Start the dev server:**
 
    ```bash
    pnpm dev
    ```
 
-3. **Open your browser:**
+5. **Open your browser:**
+
    ```
    http://localhost:3000
    ```
 
-### Build for Production
+6. **Login by name:**
 
-```bash
-pnpm build
-pnpm start
-```
+   ```
+   kalen
+   ```
+
+7. **Login by other name:**
+   ```
+   - To view messages from `kalen`
+   - Reply kalen
+   ```
+
+### Database Schema
+
+The app uses SQLite with Drizzle ORM and includes these tables:
+
+- **users_table** - User information (id, name)
+- **messages_table** - Chat messages (id, content, reaction, createdAt, createdBy)
 
 ## License
 

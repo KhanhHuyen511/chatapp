@@ -1,18 +1,27 @@
 'use client';
 
+import {
+  createMessage,
+  deleteAllMessages,
+  getMessages,
+  editMessage as editMessageAction,
+  deleteMessage as deleteMessageAction,
+} from '@/actions/messages';
 import { ReactionTypes } from '@/lib/constant/reactions';
-import { Message } from '@/lib/types/message';
-import { createContext, useContext, useState } from 'react';
+import { CreateMessageParams, Message } from '@/lib/types/message';
+import { createContext, useContext, useEffect, useState } from 'react';
+import { User } from '@/lib/types/user';
 
 type ChatContextType = {
   messages: Message[];
   setMessages: (messages: Message[]) => void;
-  addMessage: (message: Message) => void;
+  addMessage: (message: Message, user: User) => void;
   editMessage: (message: Message) => void;
   editingMessage: Message | null;
   setEditingMessage: (message: Message | null) => void;
   deleteMessage: (id: string) => void;
-  addReaction: (messageId: string, reaction: ReactionTypes) => void;
+  addReaction: (message: Message, reaction?: ReactionTypes) => void;
+  clearMessages: () => void;
 };
 
 const ChatContext = createContext<ChatContextType | null>(null);
@@ -21,39 +30,50 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [editingMessage, setEditingMessage] = useState<Message | null>(null);
 
-  const addMessage = (message: Message) => {
-    setMessages((prev) => [...prev, message]);
+  useEffect(() => {
+    getMessages().then((messages) => {
+      setMessages(messages);
+    });
+  }, []);
 
-    // TODO: Replace with actual chat logic
-    setTimeout(() => {
-      const replyMessage: Message = {
-        id: crypto.randomUUID(),
-        content: 'Hello, how are you?',
-        createdAt: new Date().toISOString(),
-        createdBy: { id: '2', name: 'User B' },
-      };
-      setMessages((prev) => [...prev, replyMessage]);
-    }, 300);
+  const addMessage = (message: CreateMessageParams, user: User) => {
+    const newMessage: Message = {
+      id: crypto.randomUUID(),
+      content: message.content,
+      attachments: message.attachments,
+      createdAt: new Date().toISOString(),
+      createdBy: user,
+    };
+
+    setMessages((prev) => [...prev, newMessage]);
+    createMessage(newMessage, user.id);
   };
 
   const editMessage = (message: Message) => {
     const { id } = message;
     setMessages((prev) => prev.map((m) => (m.id === id ? message : m)));
     setEditingMessage(null);
+    editMessageAction(message);
   };
 
   const deleteMessage = (id: string) => {
     setMessages((prev) => prev.filter((m) => m.id !== id));
+    deleteMessageAction(id);
   };
 
-  const addReaction = (messageId: string, reaction: ReactionTypes) => {
+  const addReaction = (message: Message, reaction?: ReactionTypes) => {
     setMessages((prev) =>
       prev.map((m) =>
-        m.id === messageId
-          ? { ...m, reaction: m.reaction === reaction ? undefined : reaction }
-          : m
+        m.id === message.id ? { ...m, reaction: reaction || undefined } : m
       )
     );
+
+    editMessageAction({ ...message, reaction: reaction || undefined });
+  };
+
+  const clearMessages = () => {
+    setMessages([]);
+    deleteAllMessages();
   };
 
   return (
@@ -67,6 +87,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
         editingMessage,
         setEditingMessage,
         addReaction,
+        clearMessages,
       }}
     >
       {children}
