@@ -31,6 +31,11 @@ A messaging app I built with rich text editing, file attachments, and reactions.
 - ✅ **Keyboard Shortcuts** - Ctrl+B (bold), Ctrl+I (italic), Ctrl+E (code), Ctrl+L (lists), Ctrl+Enter (send)
 - ✅ **Clipboard Support** - Paste images and auto-format URLs
 
+## Note
+
+- Every time reload -> login again -> old chat will be displayed
+- Not support send attachments -> reload -> old attachments not stored
+
 ## How to Run It
 
 ### What You Need
@@ -89,7 +94,6 @@ A messaging app I built with rich text editing, file attachments, and reactions.
    ```
    - To view messages from `kalen`
    - Reply kalen
-   - Every time reload -> login again -> old chat will be displayed
    ```
 
 ### Environment Variables
